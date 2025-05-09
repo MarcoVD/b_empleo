@@ -1,0 +1,200 @@
+{% load static %} <!-- {/* Carga la etiqueta 'static' para manejar archivos estáticos */}-->
+<!DOCTYPE html>
+<html lang="es"> {#{/* Define el idioma del documento */}#}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!--   {/* Configura la vista para dispositivos móviles (responsive) */} -->
+    <title>{% block title %}Bolsa de Empleo{% endblock %}</title> {#    {/* Bloque para el título específico de cada página */}#}
+    <link rel="icon" href="{% static 'img/colibri.ico' %}" type="image/x-icon">
+
+{#    <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">#}
+    <link href="https://fonts.googleapis.com/css2?family=Muli:wght@300;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <style>
+
+    .logo-movilidad {
+    width: 500px;
+}
+    @media (max-width: 768px){
+    .logo-movilidad{
+        width: 400px;
+    }
+}
+@media (max-width: 425px){
+    .logo-movilidad{
+        width: 300px;
+    }
+}
+    </style>
+    {% block extra_head %}{% endblock %} {#    {/* Bloque para añadir más cosas en el head desde plantillas hijas */}#}
+</head>
+<body class="d-flex flex-column min-vh-100">    {#{/* Clases Bootstrap para asegurar que el footer quede abajo */}#}
+
+{#    <header>#}
+{#        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm" role="navigation">    {#            {/* Barra de navegación Bootstrap */}#}
+{#            <div class="container">#}
+                {# Asegúrate que la URL raíz esté definida en tus urls.py #}
+{#            <a class="navbar-brand fw-bold" href="{% url 'home' %}">Inicio</a>#}
+{#                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">#}
+{#                    <span class="navbar-toggler-icon"></span>#}
+{#                </button>#}
+{#                <div class="collapse navbar-collapse" id="navbarNav">#}
+{#                    <ul class="navbar-nav ms-auto">#}
+{#                        <li class="nav-item">#}
+                            {# Enlace a la lista de vacantes usando el namespace 'empleos' #}
+{#                            <a class="nav-link {% if request.resolver_match.view_name == 'empleos:lista_vacantes' %}active{% endif %}" aria-current="page" href="{% url 'empleos:lista_vacantes' %}">Ver Ofertas</a>#}
+{#                        </li>#}
+                        {# Aquí puedes añadir más enlaces (ej. Login, Registro, Panel Admin si está logueado) #}
+{#                        {% if user.is_authenticated %}#}
+{#                            <li class="nav-item">#}
+{#                                <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>#}
+{#                            </li>#}
+                            {# Podrías añadir un enlace de Logout aquí #}
+{#                        {% endif %}#}
+{#                    </ul>#}
+{#                </div>#}
+{#            </div>#}
+{#        </nav>#}
+{#    </header>#}
+
+<ul class="navbar-nav ms-auto">
+    <li class="nav-item">
+        <a class="nav-link {% if request.resolver_match.app_name == 'empleos' and request.resolver_match.url_name == 'lista_vacantes' %}active{% endif %}" aria-current="page" href="{% url 'empleos:lista_vacantes' %}">Ver Ofertas</a>
+    </li>
+
+    {# --- Sección de Administración y Autenticación --- #}
+    {% if user.is_authenticated %}
+        {# Si el usuario está logueado Y es staff, muestra enlace a admin #}
+        {% if user.is_staff %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.app_name == 'admin_empleos' %}active{% endif %}" href="{% url 'admin_empleos:admin_dashboard' %}">Administración</a>
+            </li>
+        {% endif %}
+        {# Siempre muestra Cerrar Sesión si está logueado #}
+        <li class="nav-item">
+             {# Usamos un formulario POST para logout por seguridad #}
+             <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: inline;">
+                 {% csrf_token %}
+                 <button type="submit" class="nav-link btn btn-link" style="display: inline; padding: var(--bs-nav-link-padding-y) var(--bs-nav-link-padding-x); color: var(--bs-navbar-color);">Cerrar Sesión ({{ user.username }})</button>
+             </form>
+        </li>
+    {% else %}
+        {# Si no está logueado, muestra enlace para Iniciar Sesión #}
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">Iniciar Sesión</a>
+        </li>
+    {% endif %}
+    {# --- Fin Sección Admin/Auth --- #}
+</ul>
+
+
+    <nav class="navbar bg-primary">
+        <div class="container-fluid d-flex justify-content-between text-center p-0">
+            <a class="navbar-brand text-white col-sm-12 col-md-3 col-lg-4 col-xl-4 col-xxl-4 p-0 m-0" href="#"></a>
+            <a class="navbar-brand text-white col-sm-12 col-md-3 col-lg-4 col-xl-4 col-xxl-4 p-0 m-0" href="#"></a>
+            <a class="navbar-brand text-white col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4 p-0 m-0" href="#"></a>
+        </div>
+    </nav>
+
+    <header class="bg-light">
+        <div class="container">
+            <div class="row py-3">
+                <div class=" d-flex justify-content-center align-items-center ">
+                    <img src="{% static 'img/Mobilidad1.png' %}" alt="Logo" class="me-2 logo-movilidad">
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <main class="container mt-4 flex-grow-1" role="main"> {#        {/* El contenido principal de la página */}#}
+
+        {# Sección para mostrar mensajes de Django (contrib.messages) #}
+        {% if messages %}
+            <div class="messages mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+{#    <footer class="mt-auto py-3 bg-light text-center border-top">#}
+{#        <div class="container">#}
+{#            <p class="text-muted mb-0">&copy; {% now "Y" %} Mi Bolsa de Empleo. Todos los derechos reservados.</p>#}
+{#        </div>#}
+{#    </footer>#}
+
+    <footer class="footer ">
+        <div class="container py-5">
+            <div class="row text-center text-lg-start">
+                <div class="col-12 col-lg-3 mb-3 mb-lg-0 text-center">
+                    <img src="{% static 'img/edomex-n-color-ef96914a.svg' %}" alt="Estado de México" class="img-fluid"
+
+{#                    <img src="assets/img/edomex-n-color-ef96914a.svg" alt="Estado de México" class="img-fluid"#}
+                        style="max-width: 150px;">
+                </div>
+                <div class="col-12 col-lg-3">
+                    <h6 class="fw-bold">SITIOS DE INTERÉS</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-dark text-decoration-none">Quejas y Denuncias</a></li>
+                        <li><a href="#" class="text-dark text-decoration-none">Comisión Estatal de Mejora
+                                Regulatoria</a></li>
+                        <li><a href="#" class="text-dark text-decoration-none">Información Pública</a></li>
+                        <li><a href="#" class="text-dark text-decoration-none">Solicitud de Información</a></li>
+                    </ul>
+                </div>
+                <div class="col-12 col-lg-3">
+                    <h6 class="fw-bold">MAPA DEL SITIO</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-dark text-decoration-none"> Contáctanos</a></li>
+                        <li><a href="#" class="text-dark text-decoration-none"> Mapa del Sitio</a></li>
+                        <li><a href="#" class="text-dark text-decoration-none"> Políticas de Privacidad</a></li>
+                        <li><a href="#" class="text-dark text-decoration-none"> Acerca del Portal</a></li>
+                    </ul>
+                </div>
+                <div class="col-12 col-lg-3 text-center text-lg-start">
+                    <h6 class="fw-bold">SÍGUENOS</h6>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"><ion-icon name="logo-tumblr"></ion-icon></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i><ion-icon name="logo-twitter"></ion-icon></a>
+                        <a href="#"><i class="fab fa-youtube"><ion-icon name="logo-youtube"></ion-icon></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i><ion-icon name="logo-instagram"></ion-icon></a>
+                    </div>
+                    <p class="mt-2">
+                        Secretaría de Movilidad <br>
+                        Av. Gustavo Baz #2160, La Loma Tlalnepantla de Baz<br>
+                        Tel. 55 53 668 200
+                    </p>
+                    <div class="d-inline-block update-box">
+                        Última actualización: 20/02/2025
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="footer-bottom">
+        AVISO DE PRIVACIDAD
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    {% block extra_scripts %}{% endblock %} {#{/* Bloque para añadir scripts JS desde plantillas hijas */}#}
+
+</body>
+</html>

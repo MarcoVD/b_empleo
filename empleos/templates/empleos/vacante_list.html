@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ofertas de Empleo Disponibles - Bolsa de Empleo{% endblock %}
+
+{% block header %}
+<section class="page-header text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Ofertas de Empleo</h1>
+        <p class="lead">Encuentra la oportunidad laboral que estás buscando</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Barra lateral con filtros -->
+    <div class="col-lg-3 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtros</h5>
+            </div>
+            <div class="card-body">
+                <form action="" method="get">
+                    <div class="mb-3">
+                        <label for="ubicacion" class="form-label">Ubicación</label>
+                        <select class="form-select" id="ubicacion" name="ubicacion">
+                            <option value="">Todas las ubicaciones</option>
+                            <!-- Aquí puedes cargar dinámicamente las ubicaciones -->
+                            <option value="remoto">Remoto</option>
+                            <option value="presencial">Presencial</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="categoria" class="form-label">Categoría</label>
+                        <select class="form-select" id="categoria" name="categoria">
+                            <option value="">Todas las categorías</option>
+                            <!-- Aquí puedes cargar dinámicamente las categorías -->
+                            <option value="tecnologia">Tecnología</option>
+                            <option value="marketing">Marketing</option>
+                            <option value="administracion">Administración</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="empresa" class="form-label">Empresa</label>
+                        <input type="text" class="form-control" id="empresa" name="empresa" placeholder="Nombre de la empresa">
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Buscar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Widget informativo -->
+        <div class="card mt-4 shadow-sm bg-light">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-info-circle me-2"></i>¿Sabías que?</h5>
+                <p class="card-text">Actualizar tu perfil regularmente aumenta tus posibilidades de ser contactado por reclutadores.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de vacantes -->
+    <div class="col-lg-9">
+        <!-- Barra de búsqueda rápida -->
+        <div class="mb-4">
+            <form class="d-flex" action="" method="get">
+                <input class="form-control me-2" type="search" name="q" placeholder="Buscar ofertas de empleo..." aria-label="Buscar">
+                <button class="btn btn-primary" type="submit"><i class="fas fa-search">Buscar</i></button>
+            </form>
+        </div>
+
+        <!-- Número de resultados y ordenamiento -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <p class="mb-0"><strong>{{ vacantes.count }}</strong> ofertas encontradas</p>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-sort me-1"></i>Ordenar por
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
+                    <li><a class="dropdown-item" href="?sort=fecha">Más recientes</a></li>
+                    <li><a class="dropdown-item" href="?sort=salario_desc">Mayor salario</a></li>
+                    <li><a class="dropdown-item" href="?sort=empresa">Empresa (A-Z)</a></li>
+                </ul>
+            </div>
+        </div>
+
+        {% if vacantes %}
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                {% for vacante in vacantes %}
+                    <div class="col">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <span class="badge {% if 'remoto' in vacante.ubicacion|lower %}bg-info{% else %}bg-secondary{% endif %}">
+                                    <i class="fas {% if 'remoto' in vacante.ubicacion|lower %}fa-globe{% else %}fa-map-marker-alt{% endif %} me-1"></i>{{ vacante.ubicacion }}
+                                </span>
+                                <small class="text-muted">{{ vacante.fecha_publicacion|date:"d/m/Y" }}</small>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ vacante.titulo }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">
+                                    <i class="fas fa-building me-1"></i>{{ vacante.empresa }}
+                                </h6>
+                                {% if vacante.salario %}
+                                    <p class="card-text text-success">
+                                        <i class="fas fa-money-bill-wave me-1"></i>${{ vacante.salario|floatformat:2 }}
+                                    </p>
+                                {% endif %}
+                                <p class="card-text">{{ vacante.descripcion|truncatewords:20 }}</p>
+                            </div>
+                            <div class="card-footer bg-transparent border-top-0">
+                                <div class="d-grid">
+                                    <a href="{% url 'empleos:detalle_vacante' vacante.pk %}" class="btn btn-primary">
+                                        <i class="fas fa-eye me-1"></i>Ver Detalles
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {# Paginación #}
+            {% if is_paginated %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Anterior">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">&laquo;</span>
+                            </li>
+                        {% endif %}
+
+                        {% for i in paginator.page_range %}
+                            {% if page_obj.number == i %}
+                                <li class="page-item active" aria-current="page">
+                                    <span class="page-link">{{ i }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ i }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">{{ i }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" aria-label="Siguiente">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">&raquo;</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2"></i>No hay vacantes disponibles en este momento.
+            </div>
+            <p class="text-center mt-4">¿No encuentras lo que buscas? Vuelve a intentarlo más tarde, actualizamos nuestras ofertas constantemente.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

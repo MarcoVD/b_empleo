@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bolsa de Trabajo</title>
+</head>
+<body>
+
+{% extends 'base.html' %}
+
+{% block title %}{{ vacante.titulo }} - Bolsa de Empleo{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">{{ vacante.titulo }}</h5>
+    </div>
+    <div class="card-body">
+        <h4 class="card-subtitle mb-3 text-muted">{{ vacante.empresa }}</h4>
+        <p><strong>Ubicación:</strong> {{ vacante.ubicacion }}</p>
+        {% if vacante.salario %}
+        <p><strong>Salario:</strong> ${{ vacante.salario|floatformat:2 }}</p> {# Formatea el salario #}
+        {% endif %}
+        <p><strong>Fecha de Publicación:</strong> {{ vacante.fecha_publicacion|date:"d/m/Y H:i" }}</p>
+
+        <hr>
+
+        <h5 class="mt-4">Descripción del Puesto</h5>
+        <p style="white-space: pre-wrap;">{{ vacante.descripcion }}</p> {# Mantiene saltos de línea del texto #}
+
+        {# Puedes añadir más detalles aquí si los agregaste al modelo #}
+
+        <a href="{% url 'empleos:lista_vacantes' %}" class="btn btn-secondary mt-3">Volver a la lista</a>
+         {# Aquí podrías añadir un botón de "Aplicar" si implementas esa funcionalidad #}
+    </div>
+</div>
+
+{% endblock %}
+</body>
+</html>

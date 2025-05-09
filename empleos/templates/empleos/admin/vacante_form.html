@@ -1,0 +1,113 @@
+    {% extends "base.html" %}
+    {% load static %}
+
+    {% block title %}{{ titulo_pagina|default:"Gestionar Vacante" }}{% endblock %}
+
+    {% block content %}
+    <h1 class="mb-4 h3">{{ titulo_pagina|default:"Gestionar Vacante" }}</h1>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post" novalidate> {# novalidate evita validación HTML5, dejamos que Django valide #}
+                {% csrf_token %}
+
+                {# Mostrar errores generales del formulario si los hay #}
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {# Iterar sobre los campos del formulario #}
+                {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">
+                            {{ field.label_tag }}
+                            {% if field.field.required %}
+                                <span class="text-danger">*</span> {# Indica campos requeridos #}
+                            {% endif %}
+                        </label>
+                        {# Renderizar el campo del formulario #}
+                        {{ field }}
+                        {# Mostrar ayuda si existe #}
+                        {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text|safe }}</small>
+                        {% endif %}
+                        {# Mostrar errores específicos del campo #}
+                        {% if field.errors %}
+                            <div class="invalid-feedback d-block"> {# d-block para mostrarlo siempre #}
+                                {% for error in field.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">{{ nombre_boton|default:"Guardar" }}</button>
+                    <a href="{% url 'admin_empleos:admin_dashboard' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# Añadimos estilos para los widgets y errores (similar al login) #}
+    <style>
+        input[type="text"],
+        input[type="number"],
+        input[type="email"], /* Añade otros tipos si los usas */
+        textarea,
+        select { /* Estilo también para selects */
+            display: block;
+            width: 100%;
+            padding: .375rem .75rem;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.5;
+            color: var(--bs-body-color);
+            background-color: var(--bs-body-bg);
+            background-clip: padding-box;
+            border: var(--bs-border-width) solid var(--bs-border-color);
+            appearance: none; /* Quita apariencia nativa en algunos casos */
+            border-radius: var(--bs-border-radius);
+            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+        }
+        input[type="checkbox"] { /* Estilo específico para checkboxes */
+             width: auto;
+             margin-right: 0.5rem;
+        }
+
+        /* Estilos al enfocar */
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="email"]:focus,
+        textarea:focus,
+        select:focus {
+            color: var(--bs-body-color);
+            background-color: var(--bs-body-bg);
+            border-color: #86b7fe;
+            outline: 0;
+            box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+        }
+
+        /* Estilo para campos con errores */
+        .invalid-feedback {
+            color: var(--bs-danger);
+            margin-top: .25rem;
+            font-size: .875em;
+        }
+        /* Opcional: Borde rojo en campos con error */
+        /*
+        input.is-invalid, textarea.is-invalid, select.is-invalid {
+             border-color: var(--bs-danger);
+        }
+        input.is-invalid:focus, textarea.is-invalid:focus, select.is-invalid:focus {
+             border-color: var(--bs-danger);
+             box-shadow: 0 0 0 0.25rem rgba(var(--bs-danger-rgb),.25);
+        }
+        */
+    </style>
+    {% endblock %}
